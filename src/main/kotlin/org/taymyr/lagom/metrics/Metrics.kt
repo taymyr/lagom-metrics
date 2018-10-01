@@ -39,16 +39,16 @@ class Metrics @Inject
 constructor(conf: Config, val registry: MetricRegistry) {
 
     private val config = conf.extract<MetricsConfig>("taymyr.lagom.metrics")
-    private val statusCircuitBreakers: ConcurrentHashMap<String, CircuitBreakerStatus> = ConcurrentHashMap()
 
     @Inject
     private fun registerCircuitBreaker(injector: Injector, mat: Materializer) {
         if (config.enableCircuitBreaker) {
-            val metricsService = try { injector.getInstance(MetricsServiceImpl::class.java) } catch (e: Exception) { null }
+            val metricsService = try { injector.getInstance(MetricsServiceImpl::class.java) } catch (_: Throwable) { null }
             metricsService ?: logger.error { "Only Lagom framework module support metrics for circuit breakers" }
             metricsService?.let {
                 it.circuitBreakers().invoke().thenAccept { source ->
                     logger.info { "Metrics for circuit breakers enabled" }
+                    val statusCircuitBreakers: ConcurrentHashMap<String, CircuitBreakerStatus> = ConcurrentHashMap()
                     source.runForeach({ statuses ->
                         statuses.forEach { status ->
                             statusCircuitBreakers.compute(status.id) { id, prev ->
