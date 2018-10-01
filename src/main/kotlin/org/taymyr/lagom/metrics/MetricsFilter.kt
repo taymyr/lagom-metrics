@@ -25,14 +25,18 @@ import javax.inject.Inject
 class MetricsFilter @Inject
 constructor(mat: Materializer, private val metrics: Metrics) : Filter(mat) {
 
-    private fun normalize(path: String) = path.replace('?', '.').replace(Regex("[:&]"), "_")
+    private fun normalize(path: String) = path
+        .replaceFirst("/", "")
+        .replace(Regex("[?/]"), ".")
+        .replace(Regex("<.*>"), "")
+        .replace(Regex("[:&$\\s]"), "_")
 
     private fun routeTimerContext(requestHeader: RequestHeader, handlerDef: Optional<HandlerDef>): Timer.Context? =
-        if (handlerDef.isPresent) metrics.routeTimer(normalize(handlerDef.get().path()), requestHeader.method()).time()
+        if (handlerDef.isPresent) metrics.routeTimer("root", normalize(handlerDef.get().path()), requestHeader.method()).time()
         else null
 
     private fun routeMeter(requestHeader: RequestHeader, handlerDef: Optional<HandlerDef>, result: Result): Meter? =
-        if (handlerDef.isPresent) metrics.routeMeter(normalize(handlerDef.get().path()), requestHeader.method(), "${result.status()}")
+        if (handlerDef.isPresent) metrics.routeMeter("root", normalize(handlerDef.get().path()), requestHeader.method(), "${result.status()}")
         else null
 
     override fun apply(

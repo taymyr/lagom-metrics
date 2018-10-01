@@ -11,36 +11,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 class CircuitBreakersMetricSetTest : StringSpec({
 
-    val shareDataCircuitBreaker = CircuitBreakerStatus.builder()
-        .totalSuccessCount(2)
-        .totalFailureCount(3)
-        .throughputOneMinute(0.2)
-        .failedThroughputOneMinute(0.3)
-        .latencyMicros(Latency.builder()
-            .mean(111.0)
-            .median(222.0)
-            .percentile98th(333.0)
-            .percentile99th(444.0)
-            .percentile999th(555.0)
-            .min(666)
-            .max(777)
-            .build()
-        )
-
-    val openCircuitBreaker = shareDataCircuitBreaker.id("open").state("open").build()
-
-    val closedCircuitBreaker = shareDataCircuitBreaker.id("closed").state("closed").build()
-
-    val halfOpenCircuitBreaker = shareDataCircuitBreaker.id("half-open").state("half-open").build()
-
-    val unknownStateCircuitBreaker = shareDataCircuitBreaker.id("unknown").state("unknown").build()
-
-    val statusCircuitBreakers: ConcurrentHashMap<String, CircuitBreakerStatus> = ConcurrentHashMap()
-    statusCircuitBreakers[openCircuitBreaker.id] = openCircuitBreaker
-    statusCircuitBreakers[closedCircuitBreaker.id] = closedCircuitBreaker
-    statusCircuitBreakers[halfOpenCircuitBreaker.id] = halfOpenCircuitBreaker
-    statusCircuitBreakers[unknownStateCircuitBreaker.id] = unknownStateCircuitBreaker
-
     "Metrics for open circuit breaker should be correct" {
         val cbMetricSet = CircuitBreakersMetricSet(openCircuitBreaker.id, statusCircuitBreakers)
         cbMetricSet.metrics.values.forAll { it shouldBe beInstanceOf(Gauge::class) }
@@ -114,4 +84,39 @@ class CircuitBreakersMetricSetTest : StringSpec({
         cbMetricSet.metrics.values.forAll { it shouldBe beInstanceOf(Gauge::class) }
         cbMetricSet.metrics.values.forAll { (it as Gauge<*>).value shouldBe null }
     }
-})
+}) {
+    companion object {
+        private val shareDataCircuitBreaker: CircuitBreakerStatus.Builder = CircuitBreakerStatus.builder()
+            .totalSuccessCount(2)
+            .totalFailureCount(3)
+            .throughputOneMinute(0.2)
+            .failedThroughputOneMinute(0.3)
+            .latencyMicros(Latency.builder()
+                .mean(111.0)
+                .median(222.0)
+                .percentile98th(333.0)
+                .percentile99th(444.0)
+                .percentile999th(555.0)
+                .min(666)
+                .max(777)
+                .build()
+            )
+
+        val openCircuitBreaker: CircuitBreakerStatus = shareDataCircuitBreaker.id("open").state("open").build()
+
+        val closedCircuitBreaker: CircuitBreakerStatus = shareDataCircuitBreaker.id("closed").state("closed").build()
+
+        val halfOpenCircuitBreaker: CircuitBreakerStatus = shareDataCircuitBreaker.id("half-open").state("half-open").build()
+
+        val unknownStateCircuitBreaker: CircuitBreakerStatus = shareDataCircuitBreaker.id("unknown").state("unknown").build()
+
+        val statusCircuitBreakers: ConcurrentHashMap<String, CircuitBreakerStatus> = ConcurrentHashMap()
+
+        init {
+            statusCircuitBreakers[openCircuitBreaker.id] = openCircuitBreaker
+            statusCircuitBreakers[closedCircuitBreaker.id] = closedCircuitBreaker
+            statusCircuitBreakers[halfOpenCircuitBreaker.id] = halfOpenCircuitBreaker
+            statusCircuitBreakers[unknownStateCircuitBreaker.id] = unknownStateCircuitBreaker
+        }
+    }
+}
