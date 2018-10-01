@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.taymyr.lagom</groupId>
   <artifactId>lagom-metrics-java</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <packaging>jar</packaging>
   <name>Taymyr: Lagom Metrics</name>
   <description>Metrics for Lagom framework</description>
@@ -24,6 +24,7 @@
       <id>taymyr</id>
       <name>Taymyr Contributors</name>
       <url>https://github.com/taymyr</url>
+      <email>contributors@taymyr.org</email>
     </developer>
   </developers>
   <scm>
@@ -39,9 +40,11 @@
     <kotlintest.version>3.1.10</kotlintest.version>
     <scala.binary.version>2.12</scala.binary.version>
     <dokka.version>0.9.17</dokka.version>
-    <kotlin.version>1.2.70</kotlin.version>
+    <kotlin.version>1.2.71</kotlin.version>
     <lagom.version>[1.4.0,)</lagom.version>
+    <akka.version>2.5.17</akka.version>
     <ktlint.version>0.28.0</ktlint.version>
+    <mockito.kotlin.version>2.0.0-RC2</mockito.kotlin.version>
     <antrun.plugin.version>1.8</antrun.plugin.version>
     <source.plugin.version>3.0.1</source.plugin.version>
     <jar.plugin.version>3.1.0</jar.plugin.version>
@@ -109,6 +112,24 @@
       <version>${kotlintest.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.nhaarman.mockitokotlin2</groupId>
+      <artifactId>mockito-kotlin</artifactId>
+      <version>${mockito.kotlin.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.lightbend.lagom</groupId>
+      <artifactId>lagom-javadsl-testkit_${scala.binary.version}</artifactId>
+      <version>${lagom.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-stream-testkit_${scala.binary.version}</artifactId>
+      <version>${akka.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
@@ -121,6 +142,7 @@
         <configuration>
           <args>
             <arg>-Xjsr305=strict</arg>
+            <arg>-Xjvm-default=enable</arg>
           </args>
         </configuration>
         <executions>
