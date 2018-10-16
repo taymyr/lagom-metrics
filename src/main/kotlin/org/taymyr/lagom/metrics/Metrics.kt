@@ -32,7 +32,6 @@ import javax.inject.Singleton
  * Integration [Lagom](https://www.lagomframework.com)/[Play](https://playframework.com)
  * with [Dropwizard Metrics](https://metrics.dropwizard.io).
  *
- * @author Sergey Morgunov
  */
 @Singleton
 class Metrics @Inject
@@ -87,7 +86,7 @@ constructor(conf: Config, val registry: MetricRegistry) {
                     PICKLE -> PickledGraphite(graphiteConfig.host, graphiteConfig.port, graphiteConfig.batchSize ?: 100)
                 }
                 val reporter = GraphiteReporter.forRegistry(registry)
-                    .prefixedWith(System.getenv("HOSTNAME"))
+                    .prefixedWith(graphiteConfig.prefix)
                     .convertRatesTo(graphiteConfig.rateUnit)
                     .convertDurationsTo(graphiteConfig.durationUnit)
                     .filter(MetricFilter.ALL)

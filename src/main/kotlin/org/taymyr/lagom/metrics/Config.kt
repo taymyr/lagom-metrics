@@ -9,6 +9,7 @@ enum class GraphiteReporterType {
 }
 
 data class GraphiteReporterConfig(
+    val prefix: String? = null,
     val type: GraphiteReporterType = GraphiteReporterType.PICKLE,
     val period: Long = 10,
     val periodUnit: TimeUnit = SECONDS,

@@ -38,9 +38,6 @@ import java.lang.Thread.sleep
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 
-/**
- * @author Sergey Morgunov
- */
 class MetricsTest : WordSpec({
 
     val registrySpy = spy(MetricRegistry())
@@ -90,7 +87,6 @@ class MetricsTest : WordSpec({
             val testService = server.client(TestService::class.java)
             testService.simpleMethod().invoke().toCompletableFuture().get()
             verify(registrySpy).timer("prefix.routes.all.timer")
-            verify(registrySpy).meter("prefix.routes.all.meter")
             verify(registrySpy).timer("prefix.routes.root.foo.bar.GET.timer")
             verify(registrySpy).meter("prefix.routes.root.foo.bar.GET.200.meter")
         }
@@ -103,7 +99,6 @@ class MetricsTest : WordSpec({
             }
             badRequest.cause shouldBe beInstanceOf(BadRequest::class)
             verify(registrySpy).timer("prefix.routes.all.timer")
-            verify(registrySpy).meter("prefix.routes.all.meter")
             verify(registrySpy).timer("prefix.routes.root.foo._firstId.bar._secondId.POST.timer")
             verify(registrySpy).meter("prefix.routes.root.foo._firstId.bar._secondId.POST.400.meter")
         }
@@ -117,7 +112,6 @@ class MetricsTest : WordSpec({
             internalError.cause shouldBe beInstanceOf(TransportException::class)
             (internalError.cause as TransportException).errorCode() shouldBe InternalServerError
             verify(registrySpy).timer("prefix.routes.all.timer")
-            verify(registrySpy).meter("prefix.routes.all.meter")
             verify(registrySpy).timer("prefix.routes.root.foo._firstId.bar.pageNo_pageSize.DELETE.timer")
             verify(registrySpy).meter("prefix.routes.root.foo._firstId.bar.pageNo_pageSize.DELETE.500.meter")
         }
