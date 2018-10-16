@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.taymyr.lagom</groupId>
   <artifactId>lagom-metrics-java</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <packaging>jar</packaging>
   <name>Taymyr: Lagom Metrics</name>
   <description>Metrics for Lagom framework</description>
@@ -41,7 +41,7 @@
     <scala.binary.version>2.12</scala.binary.version>
     <dokka.version>0.9.17</dokka.version>
     <kotlin.version>1.2.71</kotlin.version>
-    <lagom.version>[1.4.0,)</lagom.version>
+    <lagom.version>1.4.2</lagom.version>
     <akka.version>2.5.17</akka.version>
     <ktlint.version>0.28.0</ktlint.version>
     <mockito.kotlin.version>2.0.0-RC2</mockito.kotlin.version>

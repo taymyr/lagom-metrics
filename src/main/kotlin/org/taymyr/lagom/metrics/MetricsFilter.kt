@@ -20,7 +20,6 @@ import javax.inject.Inject
  * Creating [Timer] and [Meter] for all requests in general and
  * particular per route.
  *
- * @author Sergey Morgunov
  */
 class MetricsFilter @Inject
 constructor(mat: Materializer, private val metrics: Metrics) : Filter(mat) {
@@ -49,7 +48,6 @@ constructor(mat: Materializer, private val metrics: Metrics) : Filter(mat) {
         return nextFilter.apply(requestHeader).thenApply<Result> { result ->
             allTimer.stop()
             routeTimer?.stop()
-            metrics.routeMeter("all").mark()
             routeMeter(requestHeader, handlerDef, result)?.mark()
             result
         }

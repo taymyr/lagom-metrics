@@ -11,9 +11,6 @@ import com.lightbend.lagom.javadsl.api.transport.Method.DELETE
 import com.lightbend.lagom.javadsl.api.transport.Method.POST
 import kotlin.reflect.jvm.javaMethod
 
-/**
- * @author Sergey Morgunov
- */
 interface TestService : Service {
 
     fun simpleMethod(): ServiceCall<NotUsed, String>

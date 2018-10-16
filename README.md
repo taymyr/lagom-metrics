@@ -1,3 +1,5 @@
+[![Gitter](https://img.shields.io/badge/chat-gitter-purple.svg)](https://gitter.im/taymyr/taymyr)
+[![Gitter_RU](https://img.shields.io/badge/chat-russian%20channel-purple.svg)](https://gitter.im/taymyr/taymyr_ru)
 [![codebeat](https://codebeat.co/badges/59cdf87f-c78d-4e68-a34f-6ba220485deb)](https://codebeat.co/projects/github-com-taymyr-lagom-metrics-java-develop)
 [![Build Status](https://travis-ci.org/taymyr/lagom-metrics-java.svg?branch=develop)](https://travis-ci.org/taymyr/lagom-metrics-java)
 [![Javadocs](https://www.javadoc.io/badge/org.taymyr.lagom/lagom-metrics-java.svg)](https://www.javadoc.io/doc/org.taymyr.lagom/lagom-metrics-java)

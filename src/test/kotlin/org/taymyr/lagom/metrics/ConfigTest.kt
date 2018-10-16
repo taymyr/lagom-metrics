@@ -12,9 +12,6 @@ import org.taymyr.lagom.metrics.GraphiteReporterType.TCP
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
-/**
- * @author Sergey Morgunov
- */
 class ConfigTest : WordSpec({
 
     "MetricsConfig" should {
@@ -61,15 +58,16 @@ class ConfigTest : WordSpec({
         "be correct for graphite reporter with full settings" {
             val config = ConfigFactory.load("full_graphite.conf").extract<MetricsConfig>("taymyr.lagom.metrics")
             config.graphiteReporter shouldNotBe null
-            config.graphiteReporter?.let {
-                it.type shouldBe TCP
-                it.host shouldBe "localhost"
-                it.port shouldBe 1000
-                it.batchSize shouldBe 1000
-                it.durationUnit shouldBe SECONDS
-                it.rateUnit shouldBe MILLISECONDS
-                it.period shouldBe 60
-                it.periodUnit shouldBe MILLISECONDS
+            config.graphiteReporter?.run {
+                prefix shouldBe "prefix"
+                type shouldBe TCP
+                host shouldBe "localhost"
+                port shouldBe 1000
+                batchSize shouldBe 1000
+                durationUnit shouldBe SECONDS
+                rateUnit shouldBe MILLISECONDS
+                period shouldBe 60
+                periodUnit shouldBe MILLISECONDS
             }
         }
     }

@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * [MetricSet] for Lagom circuit breakers [CircuitBreakerStatus]
  *
- * @author Sergey Morgunov
  */
 class CircuitBreakersMetricSet(
     private val id: String,
