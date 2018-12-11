@@ -26,6 +26,7 @@ import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
+import com.zaxxer.hikari.HikariDataSource
 import io.kotlintest.matchers.beInstanceOf
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
@@ -33,6 +34,8 @@ import io.kotlintest.specs.WordSpec
 import org.taymyr.lagom.metrics.CircuitBreakersMetricSetTest.Companion.closedCircuitBreaker
 import org.taymyr.lagom.metrics.CircuitBreakersMetricSetTest.Companion.halfOpenCircuitBreaker
 import org.taymyr.lagom.metrics.CircuitBreakersMetricSetTest.Companion.openCircuitBreaker
+import play.db.DBApi
+import play.db.Database
 import play.inject.Bindings.bind
 import java.lang.Thread.sleep
 import java.util.concurrent.CompletableFuture
@@ -41,6 +44,13 @@ import java.util.concurrent.ExecutionException
 class MetricsTest : WordSpec({
 
     val registrySpy = spy(MetricRegistry())
+    val dbApiMock = mock<DBApi> {
+        val hikari = mock<Database> {
+            on { dataSource }.thenReturn(HikariDataSource())
+        }
+        val other = mock<Database>()
+        on { databases }.thenReturn(listOf(hikari, other))
+    }
     val metricsServiceImpl = mock<MetricsServiceImpl> { _ ->
         val cbStatusSource = from(listOf(listOf(openCircuitBreaker, closedCircuitBreaker, halfOpenCircuitBreaker))).concat(maybe())
         val cbStatusCall = mock<ServiceCall<NotUsed, Source<List<CircuitBreakerStatus>, *>>> {
@@ -51,7 +61,8 @@ class MetricsTest : WordSpec({
     val server: TestServer = startServer(defaultSetup().withCluster(false).configureBuilder { b -> b
         .overrides(
             bind(MetricRegistry::class.java).toInstance(registrySpy),
-            bind(MetricsServiceImpl::class.java).toInstance(metricsServiceImpl)
+            bind(MetricsServiceImpl::class.java).toInstance(metricsServiceImpl),
+            bind(DBApi::class.java).toInstance(dbApiMock)
         )
     })
 

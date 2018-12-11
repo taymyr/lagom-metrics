@@ -9,6 +9,8 @@ import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 import org.taymyr.lagom.metrics.GraphiteReporterType.PICKLE
 import org.taymyr.lagom.metrics.GraphiteReporterType.TCP
+import java.time.Duration.ofMillis
+import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -20,6 +22,7 @@ class ConfigTest : WordSpec({
             val config = ConfigFactory.defaultReference().extract<MetricsConfig>("taymyr.lagom.metrics")
             config.enableJVM shouldBe false
             config.enableCircuitBreaker shouldBe false
+            config.enableHikari shouldBe false
             config.prefix.shouldBeEmpty()
             config.graphiteReporter shouldBe null
         }
@@ -32,6 +35,11 @@ class ConfigTest : WordSpec({
         "be able to enable circuit breakers metrics" {
             val config = ConfigFactory.load("default.conf").extract<MetricsConfig>("taymyr.lagom.metrics")
             config.enableCircuitBreaker shouldBe true
+        }
+
+        "be able to enable HikariCP metrics" {
+            val config = ConfigFactory.load("default.conf").extract<MetricsConfig>("taymyr.lagom.metrics")
+            config.enableHikari shouldBe true
         }
 
         "be throw exception for incorrect settings graphite reporter" {
@@ -50,8 +58,7 @@ class ConfigTest : WordSpec({
                 it.batchSize shouldBe null
                 it.durationUnit shouldBe MILLISECONDS
                 it.rateUnit shouldBe SECONDS
-                it.period shouldBe 10
-                it.periodUnit shouldBe SECONDS
+                it.period shouldBe ofSeconds(10)
             }
         }
 
@@ -66,8 +73,7 @@ class ConfigTest : WordSpec({
                 batchSize shouldBe 1000
                 durationUnit shouldBe SECONDS
                 rateUnit shouldBe MILLISECONDS
-                period shouldBe 60
-                periodUnit shouldBe MILLISECONDS
+                period shouldBe ofMillis(500)
             }
         }
     }
