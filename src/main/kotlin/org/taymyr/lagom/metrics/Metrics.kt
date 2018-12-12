@@ -17,14 +17,17 @@ import com.google.inject.Injector
 import com.lightbend.lagom.internal.server.status.MetricsServiceImpl
 import com.lightbend.lagom.javadsl.server.status.CircuitBreakerStatus
 import com.typesafe.config.Config
+import com.zaxxer.hikari.HikariDataSource
 import io.github.config4k.extract
 import mu.KLogging
 import org.taymyr.lagom.metrics.GraphiteReporterType.PICKLE
 import org.taymyr.lagom.metrics.GraphiteReporterType.TCP
 import org.taymyr.lagom.metrics.GraphiteReporterType.UDP
+import play.db.DBApi
 import play.inject.ApplicationLifecycle
 import java.util.concurrent.CompletableFuture.completedFuture
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,20 +35,23 @@ import javax.inject.Singleton
  * Integration [Lagom](https://www.lagomframework.com)/[Play](https://playframework.com)
  * with [Dropwizard Metrics](https://metrics.dropwizard.io).
  *
+ * @property conf Typesafe configuration
+ * @property registry Registry Dropwizard Metrics
  */
 @Singleton
 class Metrics @Inject
-constructor(conf: Config, val registry: MetricRegistry) {
+constructor(conf: Config, @Suppress("MemberVisibilityCanBePrivate") val registry: MetricRegistry) {
 
     private val config = conf.extract<MetricsConfig>("taymyr.lagom.metrics")
 
+    /** Register circuit breakers metrics. */
     @Inject
     private fun registerCircuitBreaker(injector: Injector, mat: Materializer) {
         if (config.enableCircuitBreaker) {
             val metricsService = try { injector.getInstance(MetricsServiceImpl::class.java) } catch (_: Throwable) { null }
             metricsService ?: logger.error { "Only Lagom framework module support metrics for circuit breakers" }
-            metricsService?.let {
-                it.circuitBreakers().invoke().thenAccept { source ->
+            metricsService?.run {
+                circuitBreakers().invoke().thenAccept { source ->
                     logger.info { "Metrics for circuit breakers enabled" }
                     val statusCircuitBreakers: ConcurrentHashMap<String, CircuitBreakerStatus> = ConcurrentHashMap()
                     source.runForeach({ statuses ->
@@ -61,6 +67,7 @@ constructor(conf: Config, val registry: MetricRegistry) {
         }
     }
 
+    /** Register JVM metrics. */
     @Inject
     private fun registerJVM() {
         if (config.enableJVM) {
@@ -71,11 +78,32 @@ constructor(conf: Config, val registry: MetricRegistry) {
                 registry.register(name("jvm.threads"), ThreadStatesGaugeSet())
                 logger.info { "Metrics for JVM enabled" }
             } catch (e: NoClassDefFoundError) {
-                logger.error { "Library 'metrics-jvm' not found in runtime classpath for `lagom.metrics.enableJVM = true`" }
+                logger.error { "Library 'metrics-jvm' not found in runtime classpath for `enableJVM = true`" }
             }
         }
     }
 
+    /** Register HikariCP metrics. */
+    @Inject
+    private fun registerHikari(injector: Injector) {
+        if (config.enableHikari) {
+            try {
+                val dbApi = injector.getInstance(DBApi::class.java)
+                dbApi.run {
+                    databases.forEach {
+                        (it.dataSource as? HikariDataSource)?.run {
+                            metricRegistry = registry
+                            logger.info { "Metrics for Hikari pool '$poolName' enabled" }
+                        }
+                    }
+                }
+            } catch (e: NoClassDefFoundError) {
+                logger.error { "Libraries 'play-jdbc-api' and 'HikariCP' not found in runtime classpath for `enableHikari = true`" }
+            }
+        }
+    }
+
+    /** Initialization Graphite Reporter. */
     @Inject
     private fun initGraphiteReporter(lifecycle: ApplicationLifecycle) {
         config.graphiteReporter?.let { graphiteConfig ->
@@ -91,22 +119,34 @@ constructor(conf: Config, val registry: MetricRegistry) {
                     .convertDurationsTo(graphiteConfig.durationUnit)
                     .filter(MetricFilter.ALL)
                     .build(graphite)
-                reporter.start(graphiteConfig.period, graphiteConfig.periodUnit)
+                reporter.start(graphiteConfig.period.toMillis(), MILLISECONDS)
                 lifecycle.addStopHook {
                     reporter.close()
                     completedFuture<Any>(null)
                 }
                 logger.info { "Graphite reporter started with configuration ${config.graphiteReporter}" }
             } catch (e: NoClassDefFoundError) {
-                logger.error { "Library 'metrics-graphite' not found in runtime classpath for specified `lagom.metrics.graphiteReporter`" }
+                logger.error { "Library 'metrics-graphite' not found in runtime classpath for specified `graphiteReporter`" }
             }
         }
     }
 
+    /**
+     * Create [Meter] metric for HTTP route.
+     * @param name An array of parts route
+     * @return [Meter]
+     */
     fun routeMeter(vararg name: String): Meter = registry.meter(name("routes", *name, "meter"))
+
+    /**
+     * Create [Timer] metric for HTTP route.
+     * @param name An array of parts route
+     * @return [Timer]
+     */
     fun routeTimer(vararg name: String): Timer = registry.timer(name("routes", *name, "timer"))
 
     private fun name(vararg name: String): String = MetricRegistry.name(config.prefix, *name)
 
+    /** Companion of logging */
     companion object : KLogging()
 }
