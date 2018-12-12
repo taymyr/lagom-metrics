@@ -2,7 +2,6 @@ package org.taymyr.lagom.metrics
 
 import org.taymyr.lagom.metrics.GraphiteReporterType.PICKLE
 import java.time.Duration
-import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
@@ -43,7 +42,7 @@ data class GraphiteReporterConfig(
     val type: GraphiteReporterType = PICKLE,
 
     /** Period of sending metrics to graphite. */
-    val period: Duration = ofSeconds(10),
+    val period: Duration = Duration.ofSeconds(10),
 
     /** The host of graphite application. */
     val host: String,
@@ -69,13 +68,13 @@ data class MetricsConfig(
     /** Default prefix for all (exclude Hikari) registered metrics. */
     val prefix: String,
 
-    /** Enable metrics of circuit breakers. */
+    /** Enable circuit breakers metrics. */
     val enableCircuitBreaker: Boolean,
 
-    /** Enable metrics of JVM. */
+    /** Enable JVM metrics. */
     val enableJVM: Boolean,
 
-    /** Enable metrics of HikariCP. */
+    /** Enable HikariCP metrics. */
     val enableHikari: Boolean,
 
     /** Settings for reporting metrics to Graphite. */

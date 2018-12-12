@@ -9,8 +9,7 @@ import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 import org.taymyr.lagom.metrics.GraphiteReporterType.PICKLE
 import org.taymyr.lagom.metrics.GraphiteReporterType.TCP
-import java.time.Duration.ofMillis
-import java.time.Duration.ofSeconds
+import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -58,7 +57,7 @@ class ConfigTest : WordSpec({
                 it.batchSize shouldBe null
                 it.durationUnit shouldBe MILLISECONDS
                 it.rateUnit shouldBe SECONDS
-                it.period shouldBe ofSeconds(10)
+                it.period shouldBe Duration.ofSeconds(10)
             }
         }
 
@@ -73,7 +72,7 @@ class ConfigTest : WordSpec({
                 batchSize shouldBe 1000
                 durationUnit shouldBe SECONDS
                 rateUnit shouldBe MILLISECONDS
-                period shouldBe ofMillis(500)
+                period shouldBe Duration.ofMillis(500)
             }
         }
     }

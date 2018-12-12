@@ -44,7 +44,7 @@ constructor(conf: Config, @Suppress("MemberVisibilityCanBePrivate") val registry
 
     private val config = conf.extract<MetricsConfig>("taymyr.lagom.metrics")
 
-    /** Register metrics of circuit breakers. */
+    /** Register circuit breakers metrics. */
     @Inject
     private fun registerCircuitBreaker(injector: Injector, mat: Materializer) {
         if (config.enableCircuitBreaker) {
@@ -67,7 +67,7 @@ constructor(conf: Config, @Suppress("MemberVisibilityCanBePrivate") val registry
         }
     }
 
-    /** Register metrics of JVM. */
+    /** Register JVM metrics. */
     @Inject
     private fun registerJVM() {
         if (config.enableJVM) {
@@ -83,7 +83,7 @@ constructor(conf: Config, @Suppress("MemberVisibilityCanBePrivate") val registry
         }
     }
 
-    /** Register metrics of HikariCP. */
+    /** Register HikariCP metrics. */
     @Inject
     private fun registerHikari(injector: Injector) {
         if (config.enableHikari) {

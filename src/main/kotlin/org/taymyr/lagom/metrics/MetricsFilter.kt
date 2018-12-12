@@ -20,7 +20,7 @@ import javax.inject.Inject
  * Creating [Timer] and [Meter] for all requests in general and
  * particular per route.
  *
- * @property metrics [Metrics] for registering metrics of routes
+ * @property metrics [Metrics] for registering routes metrics
  */
 class MetricsFilter @Inject
 constructor(mat: Materializer, private val metrics: Metrics) : Filter(mat) {
