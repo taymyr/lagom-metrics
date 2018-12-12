@@ -42,7 +42,9 @@
     <dokka.version>0.9.17</dokka.version>
     <kotlin.version>1.2.71</kotlin.version>
     <lagom.version>1.4.2</lagom.version>
+    <play.version>2.6.10</play.version>
     <akka.version>2.5.17</akka.version>
+    <hikari.version>2.7.9</hikari.version>
     <ktlint.version>0.28.0</ktlint.version>
     <mockito.kotlin.version>2.0.0-RC2</mockito.kotlin.version>
     <antrun.plugin.version>1.8</antrun.plugin.version>
@@ -103,6 +105,18 @@
       <groupId>com.lightbend.lagom</groupId>
       <artifactId>lagom-javadsl-server_${scala.binary.version}</artifactId>
       <version>${lagom.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.typesafe.play</groupId>
+      <artifactId>play-jdbc-api_${scala.binary.version}</artifactId>
+      <version>${play.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>${hikari.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- test dependencies -->
