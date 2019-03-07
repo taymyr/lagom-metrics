@@ -4,10 +4,10 @@ import akka.NotUsed
 import akka.stream.javadsl.Source
 import akka.stream.javadsl.Source.from
 import akka.stream.javadsl.Source.maybe
+import com.codahale.metrics.JvmAttributeGaugeSet
 import com.codahale.metrics.MetricFilter.ALL
 import com.codahale.metrics.MetricRegistry
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet
-import com.codahale.metrics.jvm.JvmAttributeGaugeSet
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet
 import com.lightbend.lagom.internal.server.status.MetricsServiceImpl

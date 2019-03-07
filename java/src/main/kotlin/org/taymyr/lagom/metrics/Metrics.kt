@@ -1,6 +1,7 @@
 package org.taymyr.lagom.metrics
 
 import akka.stream.Materializer
+import com.codahale.metrics.JvmAttributeGaugeSet
 import com.codahale.metrics.Meter
 import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
@@ -10,9 +11,9 @@ import com.codahale.metrics.graphite.GraphiteReporter
 import com.codahale.metrics.graphite.GraphiteUDP
 import com.codahale.metrics.graphite.PickledGraphite
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet
-import com.codahale.metrics.jvm.JvmAttributeGaugeSet
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet
+import com.google.inject.ConfigurationException
 import com.google.inject.Injector
 import com.lightbend.lagom.internal.server.status.MetricsServiceImpl
 import com.lightbend.lagom.javadsl.server.status.CircuitBreakerStatus
@@ -97,8 +98,13 @@ constructor(conf: Config, @Suppress("MemberVisibilityCanBePrivate") val registry
                         }
                     }
                 }
-            } catch (e: NoClassDefFoundError) {
-                logger.error { "Libraries 'play-jdbc-api' and 'HikariCP' not found in runtime classpath for `enableHikari = true`" }
+            } catch (e: Exception) {
+                when (e) {
+                    is NoClassDefFoundError, is ConfigurationException -> {
+                        logger.error { "Libraries 'play-jdbc-api' and 'HikariCP' not found in runtime classpath for `enableHikari = true`" }
+                    }
+                    else -> logger.error(e) { "Can't enable metrics for Hikari connection pool: $e" }
+                }
             }
         }
     }

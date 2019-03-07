@@ -15,7 +15,7 @@ object Versions {
     const val ktlint = "0.30.0"
     const val `kotlin-logging` = "1.6.25"
     const val config4k = "0.4.0"
-    const val metrics = "4.0.3"
+    const val metrics = "3.2.6"
     const val hikari = "2.7.9"
     const val kotlintest = "3.1.10"
     const val `mockito-kotlin` = "2.1.0"
