@@ -51,6 +51,7 @@ dependencies {
     compile("io.github.config4k", "config4k", Versions.config4k)
     compile("io.dropwizard.metrics", "metrics-core", Versions.metrics)
     compileOnly("com.lightbend.lagom", "lagom-javadsl-server_$scalaBinaryVersion", lagomVersion)
+    compileOnly("com.lightbend.lagom", "lagom-javadsl-persistence-cassandra_$scalaBinaryVersion", lagomVersion)
     compileOnly("com.typesafe.play", "play-jdbc-api_$scalaBinaryVersion", playVersion)
     compileOnly("io.dropwizard.metrics", "metrics-jvm", Versions.metrics)
     compileOnly("io.dropwizard.metrics", "metrics-graphite", Versions.metrics)

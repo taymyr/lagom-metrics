@@ -16,6 +16,7 @@ import com.codahale.metrics.jvm.ThreadStatesGaugeSet
 import com.google.inject.ConfigurationException
 import com.google.inject.Injector
 import com.lightbend.lagom.internal.server.status.MetricsServiceImpl
+import com.lightbend.lagom.javadsl.persistence.cassandra.CassandraSession
 import com.lightbend.lagom.javadsl.server.status.CircuitBreakerStatus
 import com.typesafe.config.Config
 import com.zaxxer.hikari.HikariDataSource
@@ -109,30 +110,39 @@ constructor(conf: Config, @Suppress("MemberVisibilityCanBePrivate") val registry
         }
     }
 
+    private fun initGraphiteReporterForRegistry(graphiteConfig: GraphiteReporterConfig, registry: MetricRegistry, lifecycle: ApplicationLifecycle) {
+        try {
+            val graphite = when (graphiteConfig.type) {
+                UDP -> GraphiteUDP(graphiteConfig.host, graphiteConfig.port)
+                TCP -> Graphite(graphiteConfig.host, graphiteConfig.port)
+                PICKLE -> PickledGraphite(graphiteConfig.host, graphiteConfig.port, graphiteConfig.batchSize ?: 100)
+            }
+            val reporter = GraphiteReporter.forRegistry(registry)
+                .prefixedWith(graphiteConfig.prefix)
+                .convertRatesTo(graphiteConfig.rateUnit)
+                .convertDurationsTo(graphiteConfig.durationUnit)
+                .filter(MetricFilter.ALL)
+                .build(graphite)
+            reporter.start(graphiteConfig.period.toMillis(), MILLISECONDS)
+            logger.info { "Graphite reporter for registry $registry started with configuration ${config.graphiteReporter}" }
+            lifecycle.addStopHook {
+                reporter.close()
+                completedFuture<Any>(null)
+            }
+        } catch (e: NoClassDefFoundError) {
+            logger.error { "Library 'metrics-graphite' not found in runtime classpath for specified `graphiteReporter`" }
+        }
+    }
+
     /** Initialization Graphite Reporter. */
     @Inject
-    private fun initGraphiteReporter(lifecycle: ApplicationLifecycle) {
+    private fun initGraphiteReporter(injector: Injector, lifecycle: ApplicationLifecycle) {
         config.graphiteReporter?.let { graphiteConfig ->
-            try {
-                val graphite = when (graphiteConfig.type) {
-                    UDP -> GraphiteUDP(graphiteConfig.host, graphiteConfig.port)
-                    TCP -> Graphite(graphiteConfig.host, graphiteConfig.port)
-                    PICKLE -> PickledGraphite(graphiteConfig.host, graphiteConfig.port, graphiteConfig.batchSize ?: 100)
-                }
-                val reporter = GraphiteReporter.forRegistry(registry)
-                    .prefixedWith(graphiteConfig.prefix)
-                    .convertRatesTo(graphiteConfig.rateUnit)
-                    .convertDurationsTo(graphiteConfig.durationUnit)
-                    .filter(MetricFilter.ALL)
-                    .build(graphite)
-                reporter.start(graphiteConfig.period.toMillis(), MILLISECONDS)
-                lifecycle.addStopHook {
-                    reporter.close()
-                    completedFuture<Any>(null)
-                }
-                logger.info { "Graphite reporter started with configuration ${config.graphiteReporter}" }
-            } catch (e: NoClassDefFoundError) {
-                logger.error { "Library 'metrics-graphite' not found in runtime classpath for specified `graphiteReporter`" }
+            initGraphiteReporterForRegistry(graphiteConfig, registry, lifecycle)
+            if (config.enableCassandra) {
+                val cassandraSession = try { injector.getInstance(CassandraSession::class.java) } catch (_: Throwable) { null }
+                cassandraSession ?: logger.error { "Only Lagom with Persistence Cassandra module support metrics for cassandra" }
+                cassandraSession?.underlying()?.thenAccept { initGraphiteReporterForRegistry(graphiteConfig, it.cluster.metrics.registry, lifecycle) }
             }
         }
     }
