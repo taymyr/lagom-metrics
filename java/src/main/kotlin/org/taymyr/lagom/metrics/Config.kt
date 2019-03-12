@@ -77,6 +77,9 @@ data class MetricsConfig(
     /** Enable HikariCP metrics. */
     val enableHikari: Boolean,
 
+    /** Enable Datastax Driver for Cassandra metrics. */
+    val enableCassandra: Boolean,
+
     /** Settings for reporting metrics to Graphite. */
     val graphiteReporter: GraphiteReporterConfig?
 )

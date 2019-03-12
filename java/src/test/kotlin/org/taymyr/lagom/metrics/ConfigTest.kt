@@ -22,6 +22,7 @@ class ConfigTest : WordSpec({
             config.enableJVM shouldBe false
             config.enableCircuitBreaker shouldBe false
             config.enableHikari shouldBe false
+            config.enableCassandra shouldBe false
             config.prefix.shouldBeEmpty()
             config.graphiteReporter shouldBe null
         }
@@ -39,6 +40,11 @@ class ConfigTest : WordSpec({
         "be able to enable HikariCP metrics" {
             val config = ConfigFactory.load("default.conf").extract<MetricsConfig>("taymyr.lagom.metrics")
             config.enableHikari shouldBe true
+        }
+
+        "be able to enable Apache Cassandra metrics" {
+            val config = ConfigFactory.load("default.conf").extract<MetricsConfig>("taymyr.lagom.metrics")
+            config.enableCassandra shouldBe true
         }
 
         "be throw exception for incorrect settings graphite reporter" {
