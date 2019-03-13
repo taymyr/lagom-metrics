@@ -142,7 +142,10 @@ constructor(conf: Config, @Suppress("MemberVisibilityCanBePrivate") val registry
             if (config.enableCassandra) {
                 val cassandraSession = try { injector.getInstance(CassandraSession::class.java) } catch (_: Throwable) { null }
                 cassandraSession ?: logger.error { "Only Lagom with Persistence Cassandra module support metrics for cassandra" }
-                cassandraSession?.underlying()?.thenAccept { initGraphiteReporterForRegistry(graphiteConfig, it.cluster.metrics.registry, lifecycle) }
+                cassandraSession?.underlying()?.thenAccept {
+                    val graphiteConfigCassandra = graphiteConfig.copy(prefix = "${graphiteConfig.prefix}.${config.prefix}.cassandra")
+                    initGraphiteReporterForRegistry(graphiteConfigCassandra, it.cluster.metrics.registry, lifecycle)
+                }
             }
         }
     }
