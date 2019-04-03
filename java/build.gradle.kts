@@ -14,7 +14,7 @@ object Versions {
     const val play = "2.6.10" // "2.7.0"
     const val ktlint = "0.30.0"
     const val `kotlin-logging` = "1.6.25"
-    const val config4k = "0.4.0"
+    const val config4k = "0.4.1"
     const val metrics = "3.2.6"
     const val hikari = "2.7.9"
     const val kotlintest = "3.1.10"
