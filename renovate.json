@@ -1,0 +1,10 @@
+{
+  "gradle": {
+    "gitFs": "https",
+    "enabled": true,
+    "fileMatch": ["\\.gradle(\\.kts)?$"]
+  },
+  "extends": [
+    "config:base"
+  ]
+}
