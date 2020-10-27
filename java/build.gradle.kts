@@ -9,9 +9,9 @@ val ossrhUsername: String? by project
 val ossrhPassword: String? by project
 
 object Versions {
-    const val scalaBinary = "2.12"
-    const val lagom = "1.4.6" // "1.5.0-RC2"
-    const val play = "2.6.10" // "2.7.0"
+    const val scalaBinary = "2.13" // "2.12" // "2.11"
+    const val lagom = "1.6.4" // "1.5.5" // "1.4.15"
+    const val play = "2.8.3" // "2.7.4" // "2.6.10"
     const val ktlint = "0.30.0"
     const val `kotlin-logging` = "1.6.25"
     const val config4k = "0.4.1"
@@ -30,7 +30,7 @@ val scalaBinaryVersion = project.properties["scalaBinaryVersion"] as String? ?: 
 plugins {
     kotlin("jvm") version "1.3.21"
     id("org.jetbrains.dokka") version "0.9.17"
-    id("org.jlleitschuh.gradle.ktlint") version "6.3.1"
+    id("org.jlleitschuh.gradle.ktlint") version "8.0.0"
     id("de.marcphilipp.nexus-publish") version "0.2.0"
     signing
     jacoco
@@ -61,6 +61,7 @@ dependencies {
     testCompile("com.nhaarman.mockitokotlin2", "mockito-kotlin", Versions.`mockito-kotlin`)
     testCompile("com.lightbend.lagom", "lagom-javadsl-testkit_$scalaBinaryVersion", lagomVersion)
     testCompile("com.typesafe.akka", "akka-stream-testkit_$scalaBinaryVersion", Versions.akka)
+    testCompile("com.typesafe.play", "play-akka-http-server_$scalaBinaryVersion", playVersion)
 }
 
 configurations {
