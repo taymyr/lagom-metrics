@@ -83,7 +83,7 @@ class MetricsTest : WordSpec({
 
         "initialize Graphite reporter" {
             clearInvocations(registrySpy)
-            sleep(1000) // Wait more then reporter period
+            sleep(10000) // Wait more then reporter period
             verify(registrySpy, atLeast(1)).getGauges(ALL)
             verify(registrySpy, atLeast(1)).getCounters(ALL)
             verify(registrySpy, atLeast(1)).getHistograms(ALL)
