@@ -23,6 +23,8 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
+install: skip
+
 script:
   - ./gradlew clean check -PscalaBinaryVersion=$SCALA_VERSION -PlagomVersion=$LAGOM_VERSION -PplayVersion=$PLAY_VERSION
 
@@ -35,13 +37,13 @@ before_deploy:
 deploy:
   # Deploy releases
   - provider: script
-    script: ./gradlew publishToNexus closeAndReleaseRepository -x test -Psigning.keyId=$GPG_KEY_NAME -Psigning.password="$GPG_PASSPHRASE" -Psigning.secretKeyRingFile=$HOME/.gnupg/taymyr.gpg -PossrhUsername=$OSS_USERNAME -PossrhPassword="$OSS_PASSWORD" -PscalaBinaryVersion=$SCALA_VERSION -PlagomVersion=$LAGOM_VERSION -PplayVersion=$PLAY_VERSION
+    script: ./gradlew publishToSonatype closeAndReleaseRepository -x test -Psigning.keyId=$GPG_KEY_NAME -Psigning.password="$GPG_PASSPHRASE" -Psigning.secretKeyRingFile=$HOME/.gnupg/taymyr.gpg -PossrhUsername=$OSS_USERNAME -PossrhPassword="$OSS_PASSWORD" -PscalaBinaryVersion=$SCALA_VERSION -PlagomVersion=$LAGOM_VERSION -PplayVersion=$PLAY_VERSION
     skip_cleanup: true
     on:
       tags: true
   # Deploy snapshots
   - provider: script
-    script: ./gradlew publishToNexus -x test -Psigning.keyId=$GPG_KEY_NAME -Psigning.password="$GPG_PASSPHRASE" -Psigning.secretKeyRingFile=$HOME/.gnupg/taymyr.gpg -PossrhUsername=$OSS_USERNAME -PossrhPassword="$OSS_PASSWORD" -PscalaBinaryVersion=$SCALA_VERSION -PlagomVersion=$LAGOM_VERSION -PplayVersion=$PLAY_VERSION
+    script: ./gradlew publishToSonatype -x test -x sign -PossrhUsername=$OSS_USERNAME -PossrhPassword="$OSS_PASSWORD" -PscalaBinaryVersion=$SCALA_VERSION -PlagomVersion=$LAGOM_VERSION -PplayVersion=$PLAY_VERSION
     skip_cleanup: true
     on:
       branch: master
