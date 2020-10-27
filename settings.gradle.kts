@@ -1,5 +1,4 @@
-include("java", "scala")
+include("java")
 
 rootProject.name = "lagom-metrics"
 project(":java").name = "lagom-metrics-java"
-project(":scala").name = "lagom-metrics-scala"
