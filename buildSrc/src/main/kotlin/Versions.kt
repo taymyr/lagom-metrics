@@ -6,7 +6,7 @@ object Versions {
     const val play = "2.8.3" // "2.7.4" // "2.6.10"
     const val ktlint = "0.32.0"
     const val `ktlint-plugin` = "8.0.0"
-    const val `kotlin-logging` = "1.6.25"
+    const val `kotlin-logging` = "2.0.3"
     const val jacoco = "0.8.4"
     const val junit5 = "5.3.2"
     const val `nexus-staging` = "0.21.2"
