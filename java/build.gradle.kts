@@ -20,7 +20,7 @@ compileTestKotlin.kotlinOptions.freeCompilerArgs += listOf("-Xjvm-default=enable
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    api("io.github.microutils", "kotlin-logging", Versions.`kotlin-logging`)
+    implementation("io.github.microutils", "kotlin-logging", Versions.`kotlin-logging`)
     api("io.github.config4k", "config4k", Versions.config4k)
     api("io.dropwizard.metrics", "metrics-core", Versions.metrics)
     compileOnly("com.lightbend.lagom", "lagom-javadsl-server_$scalaBinaryVersion", lagomVersion)
